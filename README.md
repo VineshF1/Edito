@@ -134,13 +134,13 @@ returns `content: null`), and `deepseek-v4.1-flash`, `stepfun-ai/step-5-preview`
 
 ## Testing
 
-```bash
-node scripts/e2e.js
-```
+Runs the full pipeline against a JD URL you pass in, saves `scripts/e2e-out.pdf`,
+and prints the model used, scores, and compile status. Page count and metric
+preservation can be checked with any PDF text extractor:
 
-Runs the full pipeline against a fixed JD URL, saves `scripts/e2e-out.pdf`, and
-prints the model used, scores, and compile status. Page count and metric
-preservation can be checked with any PDF text extractor.
+```bash
+node scripts/e2e.js https://example.com/careers/some-role
+```
 
 ## Known limitations
 

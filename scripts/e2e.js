@@ -1,4 +1,9 @@
-const jd = "https://www.appitsoftware.com/careers/junior-developer-ai-tools-hyderabad";
+// Usage: node scripts/e2e.js <job-post-url>
+const jd = process.argv[2];
+if (!jd) {
+  console.error("Usage: node scripts/e2e.js <job-post-url>");
+  process.exit(1);
+}
 
 (async () => {
   const t0 = Date.now();
