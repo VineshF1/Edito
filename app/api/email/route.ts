@@ -3,6 +3,7 @@ import { BASELINE } from "@/lib/resume-baseline";
 import { MODELS, extractJson, nimChat, type ModelKey } from "@/lib/nim";
 import { EMAIL_RULES_SYSTEM, emailUserPrompt } from "@/lib/prompts";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { looksLikeUrl, resolveJdText } from "@/lib/jd-source";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -47,7 +48,17 @@ export async function POST(req: NextRequest) {
   const thinkingOff = writerModel.includes("nemotron-3.5-super-vl");
   const toSafe = cap(to, 120);
   const contextSafe = cap(context, 8_000);
-  const jdSafe = cap(jd, 20_000);
+  let jdSafe = cap(jd, 20_000);
+
+  // Accept either pasted JD text or a job-page URL in the same field.
+  if (jdSafe && looksLikeUrl(jdSafe.trim())) {
+    try {
+      jdSafe = cap(await resolveJdText(jdSafe), 20_000);
+    } catch (err: unknown) {
+      const e = err as Error;
+      return NextResponse.json({ error: e.message }, { status: 502 });
+    }
+  }
 
   try {
     let out: {

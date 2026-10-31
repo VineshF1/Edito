@@ -129,7 +129,7 @@ export default function EmailWriter() {
               value={jd}
               onChange={(e) => setJd(e.target.value)}
               rows={4}
-              placeholder="Paste the JD so the email can reference the exact role requirements…"
+              placeholder="Paste the JD (or its link) so the email can reference the exact role requirements…"
               className="w-full resize-y p-3 text-sm"
             />
           </div>
