@@ -1,0 +1,314 @@
+@import "tailwindcss";
+
+@source "../../app/**/*.{ts,tsx}";
+@source "../../components/**/*.{ts,tsx}";
+
+/* — Edito design tokens · editorial print ——————————————— */
+:root {
+  --paper: #faf7f1;
+  --paper-2: #f2ede3;
+  --surface: #fffdf9;
+  --ink: #1a1712;
+  --ink-2: #4a4436;
+  --muted: #8b8474;
+  --line: #e0d8c8;
+  --line-2: #d4cab6;
+  --accent: #1e6b4f;
+  --accent-soft: #e7f0ea;
+  --accent-line: #b7d2c4;
+  --danger: #a63d33;
+  --danger-soft: #f6e9e6;
+  --warn: #97702a;
+  --warn-soft: #f5eeda;
+}
+
+body {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E"),
+    var(--paper);
+  color: var(--ink);
+  font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.font-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+/* — Surfaces ——————————————————————————— */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(26, 23, 18, 0.04);
+}
+
+.panel-flat {
+  background: var(--paper-2);
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+}
+
+/* — Inputs ——————————————————————————— */
+textarea,
+input,
+select {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+textarea::placeholder,
+input::placeholder {
+  color: var(--muted);
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+label {
+  letter-spacing: 0.02em;
+}
+
+/* — Buttons ——————————————————————————— */
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 999px;
+  letter-spacing: 0.01em;
+  transition: background-color 0.15s, opacity 0.15s;
+}
+.btn-primary:hover {
+  background: #175238;
+}
+.btn-primary:active {
+  transform: translateY(1px);
+}
+.btn-primary:disabled {
+  background: var(--line-2);
+  color: var(--ink-2);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-ghost {
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  color: var(--ink-2);
+  background: transparent;
+  transition: border-color 0.15s, color 0.15s, transform 0.1s;
+}
+.btn-ghost:hover {
+  border-color: var(--line-2);
+  color: var(--ink);
+  background: var(--paper-2);
+}
+.btn-ghost:active {
+  transform: translateY(1px);
+}
+
+.btn-text {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--accent-line);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s;
+}
+.btn-text:hover {
+  text-decoration-color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* — Tabs (understated segmented control) ——————————— */
+.tabbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  background: var(--paper-2);
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  padding: 4px;
+}
+.tabbar button {
+  border-radius: 9px;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  transition: color 0.15s, background-color 0.15s;
+}
+.tabbar button:hover {
+  color: var(--ink);
+}
+.tabbar button[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  border: 1px solid var(--line);
+}
+
+/* — Sliding section switch ————————————————— */
+.section-view {
+  animation: sectionIn 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes sectionIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.section-slide-right {
+  animation: secFromRight 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.section-slide-left {
+  animation: secFromLeft 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes secFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes secFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* — Editorial details ————————————————————— */
+.kicker {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rule {
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.chip {
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  border: 1px solid var(--accent-line);
+  background: var(--accent-soft);
+  color: #175238;
+}
+
+.chip-miss {
+  border: 1px solid var(--line-2);
+  background: var(--paper-2);
+  color: var(--ink-2);
+}
+
+.chip-danger {
+  border: 1px solid #e3c3bd;
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* — Diffs ——————————————————————————— */
+.del {
+  background: var(--danger-soft);
+  border-left: 2px solid var(--danger);
+  color: #5e2a24;
+  text-decoration: line-through;
+  text-decoration-color: rgba(166, 61, 51, 0.45);
+}
+
+.ins {
+  background: var(--accent-soft);
+  border-left: 2px solid var(--accent);
+}
+
+/* — Loading ——————————————————————————— */
+.skeleton-line {
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--paper-2) 25%, #ebe4d6 50%, var(--paper-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--accent);
+  margin-top: 6px;
+  flex: none;
+}
+
+.step-dot.spin {
+  animation: stepPulse 1s infinite alternate;
+}
+.step-dot.done {
+  background: var(--line-2);
+  animation: none;
+}
+
+@keyframes stepPulse {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
+/* — Score ——————————————————————————— */
+.score-ring {
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line,
+  .step-dot.spin,
+  .step-dot.done,
+  .section-slide-left,
+  .section-slide-right {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}

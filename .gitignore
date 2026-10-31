@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.env
+.env.local
+*.tsbuildinfo
+next-env.d.ts
+reference/*.log
+reference/*.pdf
+reference/*.png
+e2e-*.pdf
+.hermes/

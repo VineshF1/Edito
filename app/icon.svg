@@ -1,0 +1,14 @@
+export default function Icon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="7" fill="#1e6b4f" />
+      {/* pilcrow — the typesetter's mark */}
+      <path
+        d="M13.5 7.5c-2.8 0-4.7 2.2-4.7 4.8v13.7M13.5 7.5c3.9 0 6.7 2.6 6.7 6.3s-2.8 6.3-6.7 6.3H9M19 7.5v18.5M23 7.5v18.5"
+        stroke="#faf7f1"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
