@@ -73,7 +73,12 @@ export async function POST(req: NextRequest) {
       .trim()
       .replace(/\s+/g, "_")
       .slice(0, 50);
-    const fileName = safe ? `Vinesh_Resume_${safe}.pdf` : "Vinesh_Resume.pdf";
+    // A missing model title falls back to "Resume" — never gibberish the
+    // filename with it; the plain name is cleaner.
+    const hasTitle = safe && safe.toLowerCase() !== "resume";
+    const fileName = hasTitle
+      ? `Vinesh_Resume_${safe}.pdf`
+      : "Vinesh_Resume.pdf";
 
     // Compile, then guarantee one page: if the rewritten content spills over,
     // shrink profile-style (drop JD-added skill items first, then trim the

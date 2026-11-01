@@ -13,7 +13,7 @@ import {
   rewriteUserPrompt,
 } from "@/lib/prompts";
 import { repairJson } from "@/lib/nim";
-import { resolveJdText } from "@/lib/jd-source";
+import { resolveJdText, slugTitleFromUrl } from "@/lib/jd-source";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
           roleTitle =
             typeof kwData.roleTitle === "string" && kwData.roleTitle.trim()
               ? kwData.roleTitle.trim().slice(0, 60)
-              : "Resume";
+              : slugTitleFromUrl(jd) || "Resume";
           break;
         }
       } catch (e) {

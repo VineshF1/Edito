@@ -391,11 +391,16 @@ export default function Optimizer() {
                 <div className="mt-3 flex flex-wrap items-center gap-3">
                   <a
                     href={pdfUrl}
-                    download={`Vinesh_Resume_${(result.roleTitle || "")
-                      .replace(/[^\w\s-]/g, "")
-                      .trim()
-                      .replace(/\s+/g, "_")
-                      .slice(0, 50) || "Ready to Apply"}.pdf`}
+                    download={(() => {
+                      const t = (result.roleTitle || "")
+                        .replace(/[^\w\s-]/g, "")
+                        .trim()
+                        .replace(/\s+/g, "_")
+                        .slice(0, 50);
+                      return t && t.toLowerCase() !== "resume"
+                        ? `Vinesh_Resume_${t}.pdf`
+                        : "Vinesh_Resume.pdf";
+                    })()}
                     className="btn-primary px-5 py-2.5 text-sm"
                   >
                     Download PDF

@@ -12,6 +12,46 @@ export function looksLikeUrl(input: string): boolean {
   return /^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(s);
 }
 
+// Best-effort role title from a job-post URL slug, used when the model
+// doesn't return one. ".../junior-aiml-engineer-28443" → "Junior AI/ML Engineer".
+// Returns "" when the slug is too generic to be a title.
+const UPPER_TOKENS = new Set([
+  "ai", "ml", "aiml", "nlp", "qa", "ui", "ux", "sql", "api", "aws", "llm",
+  "rag", "devops", "saas", "sre", "html", "css", "js", "gcp",
+]);
+export function slugTitleFromUrl(input: string): string {
+  const s = (input || "").trim();
+  if (!looksLikeUrl(s)) return "";
+  try {
+    const u = new URL(s);
+    const last = u.pathname.split("/").filter(Boolean).pop() ?? "";
+    const cleaned = last
+      .replace(/[0-9]{2,}$/, "") // trailing numeric id
+      .replace(/[-_]+/g, " ")
+      .trim();
+    if (
+      !cleaned ||
+      cleaned.length < 4 ||
+      /^(jobs?|careers?|positions?|openings?|vaca.*)$/i.test(cleaned)
+    ) {
+      return "";
+    }
+    return cleaned
+      .split(" ")
+      .filter(Boolean)
+      .map((w) => {
+        const lw = w.toLowerCase();
+        if (lw === "aiml") return "AI/ML";
+        if (UPPER_TOKENS.has(lw)) return lw.toUpperCase();
+        return w.charAt(0).toUpperCase() + w.slice(1);
+      })
+      .join(" ")
+      .slice(0, 60);
+  } catch {
+    return "";
+  }
+}
+
 function isBlockedHost(host: string): boolean {
   const h = host.toLowerCase();
   if (h === "localhost" || h.endsWith(".localhost") || h.endsWith(".local")) return true;

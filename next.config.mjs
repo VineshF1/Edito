@@ -34,6 +34,7 @@ const nextConfig = {
               "img-src 'self' data: blob:",
               "font-src 'self' data:",
               "connect-src 'self' data: blob:",
+              "frame-src 'self' blob:",
               "frame-ancestors 'self'",
               "form-action 'self'",
               "base-uri 'self'",
