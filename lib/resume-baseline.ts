@@ -76,7 +76,7 @@ export const BASELINE: ResumeContent = {
     {
       id: "halos",
       bullets: [
-        "Developed a full-stack LLM application that routes each query to hybrid RAG (BM25 + pgvector) or Text-to-SQL, with 27/30 routing accuracy on a labeled test set.",
+        "Built a full-stack LLM application that routes each query to hybrid RAG (BM25 + pgvector) or Text-to-SQL, with 27/30 routing accuracy on a labeled test set.",
         "Validated Text-to-SQL on 20 known-answer queries against the live deployment: 16/20 correct (80%).",
         "Embedded and indexed 64 scraped Wikipedia pages with NVIDIA NV-Embed-v1 on Neon PostgreSQL with pgvector.",
         "Implemented prompt-injection pattern filtering, input sanitization and per-IP rate limiting (30 requests/min); deployed on Vercel and Render.",
