@@ -65,18 +65,17 @@ export async function compileToPdf(
     });
     const pdfPath = path.join(dir, `${outName}.pdf`);
     const pdf = fs.readFileSync(pdfPath);
-    // Page count via PyMuPDF when available (local tool; python is present).
+    // Page count via pdf-lib (pure JS — works identically locally and on
+    // serverless; the earlier PyMuPDF probe needed a local python that does
+    // not exist on Vercel, silently disabling the one-page gate there).
     let pages: number | null = null;
     try {
-      const { stdout } = await execFileP(
-        "python",
-        ["-c", "import fitz,sys;print(fitz.open(sys.argv[1]).page_count)", pdfPath],
-        { timeout: 15_000, windowsHide: true }
-      );
-      const n = parseInt(stdout.trim(), 10);
-      if (Number.isFinite(n)) pages = n;
+      const { PDFDocument } = await import("pdf-lib");
+      const doc = await PDFDocument.load(pdf, { ignoreEncryption: true });
+      const n = doc.getPageCount();
+      if (Number.isFinite(n) && n > 0) pages = n;
     } catch {
-      pages = null; // python/fitz unavailable — skip the one-page check
+      pages = null; // unparseable output — one-page gate disabled for safety
     }
     return { pdf, pages };
   } catch (err: unknown) {
