@@ -2,7 +2,7 @@
 import { BASELINE, type ResumeContent } from "@/lib/resume-baseline";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 import { compileToPdf } from "@/lib/compile";
-import { fillTemplate } from "@/lib/latex";
+import { fillTemplate, applySpacingProfile, SPACING_LEVELS } from "@/lib/latex";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -82,11 +82,25 @@ export async function POST(req: NextRequest) {
       ? `Vinesh_Resume_${safe}.pdf`
       : "Vinesh_Resume.pdf";
 
-    // Compile, then guarantee one page: if the rewritten content spills over,
-    // shrink profile-style (drop JD-added skill items first, then trim the
-    // longest skill lines) and recompile. Never touches frozen structure.
+    // Compile, then guarantee one page. Order:
+    //  1) typography squeeze ladder (content untouched; spacing/margins),
+    //  2) profile-style content shrink (skills → summary → bullet tails),
+    //  3) explicit error — a two-page resume is never served.
     let current: ResumeContent = use;
+    let squeezeLevel = 0;
     let { pdf, pages } = await compileToPdf(fillTemplate(current));
+    if (content && pages !== null && pages > 1) {
+      for (
+        let lvl = 1;
+        lvl <= SPACING_LEVELS.length - 1 && pages !== null && pages > 1;
+        lvl++
+      ) {
+        const r = await compileToPdf(applySpacingProfile(fillTemplate(use), lvl));
+        pdf = r.pdf;
+        pages = r.pages;
+        squeezeLevel = pages === null || pages <= 1 ? lvl : squeezeLevel;
+      }
+    }
     const hasNum = (x: string) => /\d/.test(x);
     for (
       let shrinkPass = 0;
@@ -160,6 +174,7 @@ export async function POST(req: NextRequest) {
         "Content-Disposition": `inline; filename="${fileName}"`,
         "X-Content-Type-Options": "nosniff",
         "X-Edito-Pages": String(pages ?? "unknown"),
+        "X-Edito-Squeeze": String(squeezeLevel),
         "Cache-Control": "no-store",
       },
     });

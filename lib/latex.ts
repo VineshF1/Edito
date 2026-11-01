@@ -60,4 +60,56 @@ export function fillTemplate(c: ResumeContent): string {
     .replace("{{PROJECTS}}", buildProjectsLatex(c));
 }
 
+// Typographic squeeze ladder — applied ONLY to the compiled document's
+// spacing knobs when content overflows, before any trimming. Level 0 is the
+// frozen frame untouched. All values are absolute for their level so each
+// application is a fresh, deterministic set of string replacements.
+export type SpacingProfile = {
+  margin: string;
+  itemsep: string;
+  topsep: string;
+  sectionBefore: string;
+  sectionAfter: string;
+  linespread: string;
+  nameFont?: [string, string];
+};
+
+export const SPACING_LEVELS: (SpacingProfile | null)[] = [
+  null, // 0: frozen frame as-is
+  { margin: "0.47in", itemsep: "1.5pt", topsep: "2pt", sectionBefore: "6pt", sectionAfter: "2pt", linespread: "0.95" },
+  { margin: "0.44in", itemsep: "1pt", topsep: "2pt", sectionBefore: "5pt", sectionAfter: "2pt", linespread: "0.93", nameFont: ["23pt", "25pt"] },
+  { margin: "0.4in", itemsep: "0.5pt", topsep: "1.5pt", sectionBefore: "4pt", sectionAfter: "1.5pt", linespread: "0.91" },
+  { margin: "0.35in", itemsep: "0.5pt", topsep: "1pt", sectionBefore: "4pt", sectionAfter: "1.5pt", linespread: "0.89", nameFont: ["22pt", "24pt"] },
+];
+
+function sw(tex: string, from: string, to: string): string {
+  return tex.split(from).join(to);
+}
+
+export function applySpacingProfile(tex: string, level: number): string {
+  const p = SPACING_LEVELS[level];
+  if (!p) return tex;
+  let out = tex;
+  out = sw(out, "\\usepackage[margin=0.5in]{geometry}", `\\usepackage[margin=${p.margin}]{geometry}`);
+  out = sw(
+    out,
+    "\\setlist[itemize]{leftmargin=*, itemsep=2pt, topsep=3pt, parsep=0pt}",
+    `\\setlist[itemize]{leftmargin=*, itemsep=${p.itemsep}, topsep=${p.topsep}, parsep=0pt}`
+  );
+  out = sw(
+    out,
+    "\\titlespacing*{\\section}{0pt}{8pt}{3pt}",
+    `\\titlespacing*{\\section}{0pt}{${p.sectionBefore}}{${p.sectionAfter}}`
+  );
+  out = sw(out, "\\linespread{0.97}", `\\linespread{${p.linespread}}`);
+  if (p.nameFont) {
+    out = sw(
+      out,
+      "{\\fontsize{24}{26}\\selectfont\\scshape",
+      `{\\fontsize{${p.nameFont[0]}}{${p.nameFont[1]}}\\selectfont\\scshape`
+    );
+  }
+  return out;
+}
+
 export { BASELINE };

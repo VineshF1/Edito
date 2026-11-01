@@ -36,17 +36,19 @@ application emails from the same resume data.
 
 ### One-page guarantee
 
-The frozen template is a one-page layout. Three layers keep output on one
-page:
+The frozen template is a one-page layout. The compile step keeps your content
+intact first, and only tightens things if needed, in this order:
 
-1. length budgets in the optimize route (skill-line caps, per-bullet caps,
+1. **Typography ladder** (content untouched): up to four spacing profiles —
+   margins 0.5"→0.35", linespread 0.97→0.89, tighter list/section spacing,
+   smaller name type — recompiling after each step until it fits.
+2. **Content budgeting** at optimize time (skill-line caps, per-bullet caps,
    whole-document budget with tail trims that prefer keeping numeric
-   sentences),
-2. if the compiled PDF still spills over, the compile route recompiles up to
-   four times with progressively tighter profiles (skill lines → summary →
-   bullet tails),
-3. if one page is still not achievable, the request returns an error asking
-   for a regeneration — it never serves a two-page resume.
+   sentences).
+3. If it still overflows, the compile route shrinks content progressively
+   (skills → summary → bullet tails) and recompiles.
+4. Last resort: the request returns an error asking for a regeneration — a
+   two-page resume is never served.
 
 ### Email Writer
 
