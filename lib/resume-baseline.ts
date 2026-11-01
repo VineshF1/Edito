@@ -44,24 +44,24 @@ export const BASELINE: ResumeContent = {
   skills: [
     {
       label: "Programming Languages",
-      items: ["Python", "TypeScript", "JavaScript", "SQL"],
+      items: ["Python", "SQL", "TypeScript", "JavaScript"],
     },
     {
       label: "AI/ML",
       items: [
         "RAG",
         "Hybrid Search",
-        "Text-to-SQL",
         "Multi-Agent Systems",
         "LLM Fine-tuning (QLoRA)",
         "MCP",
         "Google ADK",
-        "Hugging Face",
+        "LangChain",
+        "Vector Databases",
       ],
     },
     {
       label: "Frameworks",
-      items: ["FastAPI", "React", "LangChain", "Unsloth"],
+      items: ["FastAPI", "LangGraph", "React", "Unsloth"],
     },
     {
       label: "Databases & Vector Search",

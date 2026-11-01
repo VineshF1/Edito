@@ -63,7 +63,9 @@ export async function POST(req: NextRequest) {
     } catch {
       // empty body = baseline compile
     }
-    const violation = fail(content);
+    // Only validate content the user actually sent; an omitted body means
+    // "compile the frozen baseline as-is" (fail() treats undefined as an error).
+    const violation = content !== undefined ? fail(content) : null;
     if (violation) {
       return NextResponse.json({ error: violation }, { status: 400 });
     }
