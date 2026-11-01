@@ -242,6 +242,10 @@ export default function Optimizer() {
           <section className="grid grid-cols-2 gap-3 sm:gap-4">
             <ScoreRing label="ATS score · before" score={result.scoreBefore} />
             <ScoreRing label="ATS score · after" score={result.scoreAfter} />
+            <p className="col-span-2 text-center text-xs text-[var(--muted)]">
+              Score = coverage of the keywords the JD analysis flagged
+              important (chips below show every keyword).
+            </p>
           </section>
 
           <section className="panel p-4 sm:p-6">

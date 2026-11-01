@@ -25,9 +25,10 @@ application emails from the same resume data.
    baseline resume cannot support are dropped, and per-bullet plus
    whole-document length budgets are applied.
 5. **Scoring** — before/after numbers are reported: the score is keyword
-   coverage (matched keywords ÷ all extracted keywords present in the resume
-   text). It is a self-consistency metric for this tool, not a prediction of
-   how any real ATS would rank the document.
+   coverage over the subset the extraction flagged `important` (all extracted
+   keywords if too few are flagged; chips show every keyword). It is a
+   self-consistency metric for this tool, not a prediction of how any real
+   ATS would rank the document.
 6. **Compile** — the edited JSON is injected into the frozen `.tex` frame
    (engine-guarded so it builds identically under Tectonic and pdfLaTeX) and
    compiled with the vendored Tectonic binary. The PDF is served with a

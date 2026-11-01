@@ -328,13 +328,19 @@ export async function POST(req: NextRequest) {
       if (docTotal() > budget) break; // further passes only if first helped
     }
 
-    // Step 3 — score before / after
+    // Step 3 — score before / after. The score champions the keywords the
+    // extraction flagged `important` (fallback: all keywords when too few
+    // are flagged); chips keep showing every keyword. Numerator and
+    // denominator always refer to the same set.
+    const importantSet = keywords.filter((k) => k.important);
+    const scoreSet = importantSet.length >= 5 ? importantSet : keywords;
     const before = matchKeywords(keywords, baselineText);
     const afterText = resumeAsText(edits);
     const after = matchKeywords(keywords, afterText);
-    const total = totalOf(keywords);
-    const scoreBefore = atsScore(before.matched.length, total);
-    const scoreAfter = atsScore(after.matched.length, total);
+    const scoreBeforeText = matchKeywords(scoreSet, baselineText);
+    const scoreAfterText = matchKeywords(scoreSet, afterText);
+    const scoreBefore = atsScore(scoreBeforeText.matched.length, scoreSet.length);
+    const scoreAfter = atsScore(scoreAfterText.matched.length, scoreSet.length);
 
     const skillDiffs = BASELINE.skills.map((s, i) => ({
       label: s.label,
@@ -386,8 +392,3 @@ const PROJECT_NAME: Record<string, string> = {
   skytrace: "SkyTrace — Satellite Tracker",
   eaurouge: "EauRouge-F1 — Qwen3-8B QLoRA",
 };
-
-function totalOf(kws: Keyword[]): number {
-  const imp = kws.filter((k) => k.important);
-  return imp.length > 3 ? imp.length : kws.length;
-}
