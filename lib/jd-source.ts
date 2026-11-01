@@ -13,43 +13,55 @@ export function looksLikeUrl(input: string): boolean {
 }
 
 // Best-effort role title from a job-post URL slug, used when the model
-// doesn't return one. ".../junior-aiml-engineer-28443" → "Junior AI/ML Engineer".
-// Returns "" when the slug is too generic to be a title.
+// doesn't return one. Handles real-world shapes:
+//  "/jobs/junior-aiml-engineer-28443"             → "Junior AI/ML Engineer"
+//  ".../job/AI-ML-...-Associate_AIOC-S01665346-1" → "AI ML Computational Science Associate"
+// Junk segments ("jobdetails", "careers", ...) return "" → plain filename.
 const UPPER_TOKENS = new Set([
   "ai", "ml", "aiml", "nlp", "qa", "ui", "ux", "sql", "api", "aws", "llm",
-  "rag", "devops", "saas", "sre", "html", "css", "js", "gcp",
+  "rag", "devops", "saas", "sre", "html", "css", "js", "gcp", "it",
 ]);
+const JUNK_SEGMENTS =
+  /^(jobs?|careers?|positions?|openings?|vacanc\w*|job-?details?|details?|descriptions?|listings?|search|welcome|homedetails?|en-us|en-gb|en-in|us|in|gb)$/i;
+
+function titleCaseToken(w: string): string {
+  const lw = w.toLowerCase();
+  if (lw === "aiml" || lw === "ai/ml") return "AI/ML";
+  if (UPPER_TOKENS.has(lw)) return lw.toUpperCase();
+  return w.charAt(0).toUpperCase() + w.slice(1);
+}
+
 export function slugTitleFromUrl(input: string): string {
   const s = (input || "").trim();
   if (!looksLikeUrl(s)) return "";
   try {
     const u = new URL(s);
-    const last = u.pathname.split("/").filter(Boolean).pop() ?? "";
-    const cleaned = last
-      .replace(/[0-9]{2,}$/, "") // trailing numeric id
-      .replace(/[-_]+/g, " ")
-      .trim();
-    if (
-      !cleaned ||
-      cleaned.length < 4 ||
-      /^(jobs?|careers?|positions?|openings?|vaca.*)$/i.test(cleaned)
-    ) {
-      return "";
+    const segs = u.pathname.split("/").filter(Boolean).reverse();
+    for (const seg of segs) {
+      if (JUNK_SEGMENTS.test(seg)) continue;
+      // split off "_JOB-CODE" suffixes (Workday style), then drop every
+      // token that carries digits (job ids like "S01665346") or is numeric
+      let toks = seg.split("_")[0].split("-").filter(Boolean);
+      if (!toks.length || seg.length < 4) continue;
+      toks = toks.filter((t) => !(t.length >= 5 && /\d/.test(t)));
+      while (toks.length && /^[0-9]+$/.test(toks[(toks.length ?? 1) - 1])) {
+        toks.pop();
+      }
+      const cleaned = toks.join(" ").trim();
+      if (!cleaned || cleaned.length < 4 || JUNK_SEGMENTS.test(cleaned)) {
+        continue;
+      }
+      return cleaned
+        .split(" ")
+        .filter(Boolean)
+        .map(titleCaseToken)
+        .join(" ")
+        .slice(0, 60);
     }
-    return cleaned
-      .split(" ")
-      .filter(Boolean)
-      .map((w) => {
-        const lw = w.toLowerCase();
-        if (lw === "aiml") return "AI/ML";
-        if (UPPER_TOKENS.has(lw)) return lw.toUpperCase();
-        return w.charAt(0).toUpperCase() + w.slice(1);
-      })
-      .join(" ")
-      .slice(0, 60);
   } catch {
     return "";
   }
+  return "";
 }
 
 function isBlockedHost(host: string): boolean {

@@ -51,7 +51,8 @@ Return only JSON.`;
 }
 
 export const KEYWORD_EXTRACTION_SYSTEM = `You extract ATS keywords from job descriptions.
-Return strict JSON: {"keywords": [{"term": "...", "important": true|false}]}
+Return strict JSON: {"roleTitle": "<the exact job title from the posting, or the evident title>", "keywords": [{"term": "...", "important": true|false}]}
+roleTitle is REQUIRED in every response — use the posting's job title verbatim (or infer the closest role name from the responsibilities if the title is absent). Never leave it out.
 Keywords = specific skills, tools, technologies, role titles, and hard requirements the ATS would match on. Skip company names, benefits, soft-skill filler ("passionate"), and HR phrases. Max 25 keywords, ordered by importance.`;
 
 export const EMAIL_RULES_SYSTEM = `You write job-application emails for a fresher (India market, AI/ML student).
