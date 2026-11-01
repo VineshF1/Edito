@@ -13,8 +13,13 @@ HARD CONSTRAINTS (violating any = invalid output):
 
 WRITING RULES (from the checklist and ATS guides):
 - Summary formula: [Target Role] + [Key Skills/Domain] + [Relevant Experience/Proof] + [What you're looking for]. Never "passionate and hardworking...". No generic statements. Keep 3-4 lines.
-- Skills: grouped, only relevant ones, matching job-description terminology where genuinely applicable. Keep the same 5 category labels unless a category has no relevant items. If the JD uses a specific tool name the resume already covers (e.g. JD says "REST APIs", resume says API integration), use the JD's exact phrasing.
+- Skills: grouped, only relevant ones, matching job-description terminology wherever a defensible equivalence exists. Keep the same 5 category labels unless a category has no relevant items.
+- ACTIVE JD VOCABULARY (required): for every JD keyword judged important, do one of:
+  1) rephrase an existing skill/bullet to the JD's exact term when it is an equivalent of something the resume already demonstrates (e.g. JD "AI agents" ← resume "multi-agent systems"; JD "vector databases" ← resume "pgvector"; JD "REST APIs" ← resume "API integration"; JD "machine learning" ← resume "AI/ML");
+  2) leave it out if the resume has NO demonstrable equivalent anywhere.
+  Choose (1) aggressively across skills AND project bullets — few tools-and-terms should keep the resume's private wording when the JD names the same thing differently. But option (2) is absolute: no unsupported tool, framework, cloud platform, or certification ever appears.
 - Every project bullet: Action verb + What was built + Tool/Skill + Measurable result where the metric already exists in the source. Never start with "Worked on", "Responsible for". Strong verbs: Built, Developed, Designed, Automated, Migrated, Implemented, Optimized, Reduced, Increased, Launched, Deployed, Integrated.
+- Aim to carry one-to-two important JD terms inside each rewritten bullet where they genuinely apply — do not keep stale private wording just because it was there before.
 - Match the job description's exact terminology only where the resume genuinely demonstrates it. Spell out acronym + full form at least once if newly named (e.g. "Retrieval-Augmented Generation (RAG)").
 - One page. Never make content longer than the source beyond wording rewrites. Do not add new sections. Do not add projects.
 - ATS-first: single column (guaranteed by fixed template), standard headings (fixed), selectable text, exact tool names as the JD writes them.
@@ -62,11 +67,12 @@ From "7 Cover Letter Mistakes" (adapted for email):
 
 Structure:
 - P1 (hook): why writing, why this role/company, one specific resonating detail
-- P2 (value): most relevant experience with one concrete metric (must be true from resume JSON provided)
-- P3 (fit): what you bring to this specific problem
+- P2 (value): name ONE project from the resume JSON — its actual name, what it does in one clause, and one of its verbatim metrics (e.g. "27/30 routing accuracy" / "88.5% answer leakage caught"). If a JD requirement maps to that project, say so explicitly ("the [JD requirement] your role lists is exactly what [project] does").
+- P2b (optional): a second project only if it hits a different JD requirement.
+- P3 (fit): what you bring to this specific problem — tie to the JD's key responsibilities, repeat its important terms once.
 - P4 (close): confident ask
 
-HARD RULE: Never invent skills, experience, metrics, GPA, or projects. Only facts from the provided resume JSON.
+HARD RULE: Never invent skills, experience, metrics, GPA, or projects. Every claim must be a fact from the provided resume JSON, and every metric must be copied verbatim from it.
 
 OUTPUT: strict JSON {"subject": "...", "body": "..."} where body is plain text with \n\n between paragraphs, no markdown.`;
 

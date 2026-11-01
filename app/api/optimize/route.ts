@@ -15,6 +15,7 @@ import {
 import { repairJson } from "@/lib/nim";
 import { resolveJdText, slugTitleFromUrl } from "@/lib/jd-source";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { TokenSet, termMatched } from "@/lib/matching";
 
 export const runtime = "nodejs";
 export const maxDuration = 240;
@@ -56,16 +57,13 @@ function matchKeywords(
   kws: Keyword[],
   text: string
 ): { matched: string[]; missing: string[] } {
+  // Token-set matching with plural tolerance (see lib/matching.ts) — order
+  // and punctuation do not matter, so honest paraphrases score correctly.
+  const res = new TokenSet(text);
   const matched: string[] = [];
   const missing: string[] = [];
   for (const k of kws) {
-    const t = k.term.toLowerCase();
-    const hit =
-      text.includes(t) ||
-      // crude plural/singular tolerance
-      (t.endsWith("s") && text.includes(t.slice(0, -1))) ||
-      (!t.endsWith("s") && text.includes(`${t}s`));
-    (hit ? matched : missing).push(k.term);
+    (termMatched(k.term, res) ? matched : missing).push(k.term);
   }
   return { matched, missing };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Keyword = { term: string; important: boolean };
 
@@ -75,6 +75,76 @@ export default function Optimizer() {
   const [result, setResult] = useState<Result | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
+  // Mobile browsers (Android Chrome, iOS Safari) render PDF blobs poorly or
+  // not at all inside iframes — swap the preview for open/download actions.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px), (pointer: coarse)");
+    const on = () => setIsMobile(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+
+  // Local history of generated resumes (stays on this device; regenerating
+  // the PDF works anytime, so a deleted download is never a lost result).
+  type HistoryEntry = {
+    ts: number;
+    roleTitle: string;
+    scoreBefore: number;
+    scoreAfter: number;
+    jdExcerpt: string;
+    result: Result;
+  };
+  const HISTORY_KEY = "edito-history-v1";
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      if (raw) setHistory(JSON.parse(raw));
+    } catch {
+      // storage unavailable — history silently disabled
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  function saveHistory(data: Result, jdText: string) {
+    setHistory((prev) => {
+      const entry: HistoryEntry = {
+        ts: Date.now(),
+        roleTitle: data.roleTitle,
+        scoreBefore: data.scoreBefore,
+        scoreAfter: data.scoreAfter,
+        jdExcerpt: jdText.replace(/\s+/g, " ").slice(0, 120),
+        result: data,
+      };
+      const next = [entry, ...prev.filter((e) => e.result.edits?.summary !== entry.result.edits?.summary)].slice(0, 12);
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+      } catch {
+        // quota/off — keep in-memory only
+      }
+      return next;
+    });
+  }
+  function dropHistory(ts: number) {
+    setHistory((prev) => {
+      const next = prev.filter((e) => e.ts !== ts);
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }
+  function restore(entry: HistoryEntry) {
+    setPdfUrl(null);
+    setError("");
+    setResult(entry.result);
+    setJd((j) => j || entry.jdExcerpt);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   async function optimize() {
     setError("");
     setResult(null);
@@ -93,6 +163,7 @@ export default function Optimizer() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Optimization failed");
       setResult(data);
+      saveHistory(data, jd);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -385,12 +456,34 @@ export default function Optimizer() {
             )}
             {pdfUrl && (
               <div className="mt-5">
+                {isMobile && (
+                  <p className="mb-3 text-xs leading-relaxed text-[var(--muted)]">
+                    Phones don't render PDF previews inside the page — open it
+                    in a viewer app (or your browser's PDF chrome) instead.
+                  </p>
+                )}
                 <div className="overflow-hidden rounded-xl border border-[var(--line-2)] shadow-sm">
-                  <iframe
-                    src={pdfUrl}
-                    title="Resume preview"
-                    className="h-[520px] w-full bg-white sm:h-[735px]"
-                  />
+                  {isMobile ? (
+                    <div className="flex flex-col gap-3 p-5">
+                      <a
+                        href={pdfUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="btn-primary px-5 py-3 text-sm text-center"
+                      >
+                        Open resume PDF
+                      </a>
+                      <span className="text-xs text-center text-[var(--muted)]">
+                        Open it, screenshot it, or download it below.
+                      </span>
+                    </div>
+                  ) : (
+                    <iframe
+                      src={pdfUrl}
+                      title="Resume preview"
+                      className="h-[520px] w-full bg-white sm:h-[735px]"
+                    />
+                  )}
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-3">
                   <a
@@ -409,6 +502,14 @@ export default function Optimizer() {
                   >
                     Download PDF
                   </a>
+                  {isMobile && (
+                    <button
+                      onClick={() => window.open(pdfUrl, "_blank")}
+                      className="btn-ghost px-4 py-2.5 text-sm"
+                    >
+                      Open in viewer
+                    </button>
+                  )}
                   <span className="text-xs text-[var(--muted)]">
                     Before submitting: copy all text from the PDF into a blank
                     document — if it reads clean, the ATS will read it clean.
@@ -417,6 +518,44 @@ export default function Optimizer() {
               </div>
             )}
           </section>
+          {history.length > 0 && (
+            <section className="panel p-4 sm:p-6">
+              <div className="mb-3 flex items-baseline justify-between">
+                <h3 className="kicker">Generated on this device</h3>
+                <span className="text-[11px] text-[var(--muted)]">
+                  Nothing leaves your machine; re-download anytime
+                </span>
+              </div>
+              <ul className="divide-y divide-[var(--line)]">
+                {history.map((h) => (
+                  <li key={h.ts} className="flex items-center gap-3 py-2.5">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">
+                        {h.roleTitle}
+                      </p>
+                      <p className="truncate text-[11px] text-[var(--muted)]">
+                        {new Date(h.ts).toLocaleString()} · {h.scoreBefore}→
+                        {h.scoreAfter} · {h.jdExcerpt}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => restore(h)}
+                      className="btn-ghost flex-none px-3 py-1.5 text-xs"
+                    >
+                      Restore
+                    </button>
+                    <button
+                      onClick={() => dropHistory(h.ts)}
+                      className="btn-ghost flex-none px-3 py-1.5 text-xs"
+                      aria-label="Remove from history"
+                    >
+                      ✕
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </>
       )}
     </div>
