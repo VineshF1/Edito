@@ -25,6 +25,9 @@ function tectonicBinary(): string {
   );
 }
 
+const TMP_BIN_DIR = path.join(os.tmpdir(), "tectonic-bin");
+const CACHE_DIR = path.join(os.tmpdir(), "tectonic-cache");
+
 export async function compileToPdf(
   tex: string,
   outName = "resume"
@@ -36,18 +39,25 @@ export async function compileToPdf(
     // chcp 65001 not needed; write UTF-8 without BOM — Tectonic requires UTF-8.
     fs.writeFileSync(texPath, tex, { encoding: "utf8" });
     const bin = tectonicBinary();
+    let execBin = bin;
     if (process.platform !== "win32") {
-      // Deployed files lose the +x bit; restore it (cheap, idempotent).
-      fs.chmodSync(bin, 0o755);
-      // Cache dir: on serverless (Vercel) HOME is read-only — keep the
-      // bundle cache under /tmp so warm invocations reuse it. Windows (dev)
-      // keeps the default user cache, which is already warm.
-      const cacheDir = path.join(os.tmpdir(), "tectonic-cache");
-      fs.mkdirSync(cacheDir, { recursive: true });
-      cacheEnv = { TECTONIC_CACHE_DIR: cacheDir };
+      // On serverless (e.g. Vercel) the deployed files are read-only and may
+      // lack the +x bit: copy the binary to the writable /tmp and chmod it.
+      // Memoized across warm invocations via the module-level copy cache.
+      fs.mkdirSync(TMP_BIN_DIR, { recursive: true });
+      const copy = path.join(TMP_BIN_DIR, path.basename(bin));
+      if (!fs.existsSync(copy)) {
+        fs.copyFileSync(bin, copy);
+        fs.chmodSync(copy, 0o755);
+      }
+      execBin = copy;
+      // Cache dir: HOME is read-only on serverless — keep the bundle cache
+      // under /tmp so warm invocations reuse it.
+      fs.mkdirSync(CACHE_DIR, { recursive: true });
+      cacheEnv = { TECTONIC_CACHE_DIR: CACHE_DIR };
     }
     // Run tectonic with cwd = dir so logs stay per-request.
-    await execFileP(bin, [`${outName}.tex`], {
+    await execFileP(execBin, [`${outName}.tex`], {
       cwd: dir,
       timeout: 120_000,
       windowsHide: true,
