@@ -12,6 +12,7 @@ type Result = {
   scoreAfter: number;
   usedWriter: string;
   roleTitle: string;
+  suggested: string[];
   matchedAfter: string[];
   missingAfter: string[];
   edits: {
@@ -390,6 +391,24 @@ export default function Optimizer() {
                     </span>
                   ))}
                 </div>
+                {result.suggested.length > 0 && (
+                  <div className="mt-3 rounded-xl border border-[var(--line-2)] p-3">
+                    <p className="mb-1.5 text-xs font-medium text-[var(--ink-2)]">
+                      JD keywords your resume doesn’t evidence yet
+                    </p>
+                    <p className="mb-2 text-[11px] leading-relaxed text-[var(--muted)]">
+                      Only add these — to your master resume — if you have
+                      genuinely used them. The tailor won’t fake them.
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {result.suggested.map((t) => (
+                        <span key={t} className="chip">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </section>

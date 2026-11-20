@@ -30,6 +30,7 @@ type OptimizeResponse = {
   scoreAfter: number;
   usedWriter: string;
   roleTitle: string;
+  suggested: string[];
   matchedAfter: string[];
   missingAfter: string[];
   edits: ResumeContent & {
@@ -393,6 +394,17 @@ export async function POST(req: NextRequest) {
       after: edits.projects[i].bullets,
     }));
 
+    // Keywords the JD flags as important but the resume can't currently
+    // support. Shown to the user as "confirm you have this" — they are never
+    // auto-added; honesty stays theirs to own.
+    const afterSet = new TokenSet(resumeAsText(edits));
+    const suggested = keywords
+      .filter((k) => k.important)
+      .map((k) => k.term.trim())
+      .filter((t) => t.length > 1 && t.length <= 32)
+      .filter((t) => !termMatched(t, afterSet))
+      .slice(0, 8);
+
     const resp: OptimizeResponse = {
       keywords,
       matchedBefore: before.matched,
@@ -401,6 +413,7 @@ export async function POST(req: NextRequest) {
       scoreAfter,
       usedWriter,
       roleTitle,
+      suggested,
       matchedAfter: after.matched,
       missingAfter: after.missing,
       edits: {
