@@ -40,7 +40,7 @@ export const SKILL_LABELS = [
 
 export const BASELINE: ResumeContent = {
   summary:
-    "B.Tech student in Artificial Intelligence and Machine Learning (graduating 2027) with hands-on experience building Generative AI applications, RAG systems with hybrid search, and multi-agent systems using LangGraph, Google ADK and MCP. Experience in LLM fine-tuning (QLoRA). Skilled in Python, FastAPI and LLM API integration, with experience shipping live AI applications.",
+    "B.Tech student in Artificial Intelligence and Machine Learning (graduating 2027) with hands-on experience building end-to-end Generative AI applications: React front ends, FastAPI backends and LLM integration. Shipped RAG pipelines with hybrid search, Text-to-SQL and multi-agent systems (LangGraph, Google ADK, MCP) plus a QLoRA fine-tune, with prompt-injection defenses.",
   skills: [
     {
       label: "Programming Languages",
@@ -51,6 +51,9 @@ export const BASELINE: ResumeContent = {
       items: [
         "RAG",
         "Hybrid Search",
+        "Text-to-SQL",
+        "Prompt Engineering",
+        "LLM Guardrails",
         "Multi-Agent Systems",
         "LLM Fine-tuning (QLoRA)",
         "MCP",
@@ -69,17 +72,17 @@ export const BASELINE: ResumeContent = {
     },
     {
       label: "Developer Tools",
-      items: ["Git", "GitHub", "Docker", "Vercel"],
+      items: ["Git", "GitHub", "Docker", "Vercel", "Render", "AI-assisted development"],
     },
   ],
   projects: [
     {
       id: "halos",
       bullets: [
-        "Built a full-stack LLM application that routes each query to hybrid RAG (BM25 + pgvector) or Text-to-SQL, with 27/30 routing accuracy on a labeled test set.",
+        "Built a full-stack LLM application (React/TypeScript front end, FastAPI backend) that routes each query to hybrid RAG (BM25 + pgvector) or Text-to-SQL, with 27/30 routing accuracy on a labeled test set.",
         "Validated Text-to-SQL on 20 known-answer queries against the live deployment: 16/20 correct (80%).",
-        "Embedded and indexed 64 scraped Wikipedia pages with NVIDIA NV-Embed-v1 on Neon PostgreSQL with pgvector.",
-        "Implemented prompt-injection pattern filtering, input sanitization and per-IP rate limiting (30 requests/min); deployed on Vercel and Render.",
+        "Scraped 64 Wikipedia pages with Playwright, chunked them to 1,469 embeddings with NVIDIA NV-Embed-v1 and indexed them in Neon PostgreSQL with pgvector.",
+        "Implemented prompt-injection detection, input sanitization and per-IP rate limiting (30 requests/min) on the FastAPI backend; deployed to Vercel and Render.",
       ],
     },
     {

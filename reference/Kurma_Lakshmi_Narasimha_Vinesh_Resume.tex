@@ -46,17 +46,17 @@
 
 %------------------------------------------------
 \section*{Summary}
-B.Tech student in Artificial Intelligence and Machine Learning (graduating 2027) with hands-on experience building
-Generative AI applications, RAG systems with hybrid search, and multi-agent systems using LangGraph, Google
-ADK and MCP. Experience in LLM fine-tuning (QLoRA). Skilled in Python, FastAPI and LLM API integration,
-with experience shipping live AI applications.
+B.Tech student in Artificial Intelligence and Machine Learning (graduating 2027) with hands-on experience
+building end-to-end Generative AI applications: React front ends, FastAPI backends and LLM integration.
+Shipped RAG pipelines with hybrid search, Text\mbox{-}to\mbox{-}SQL and multi-agent systems (LangGraph, Google ADK,
+MCP) plus a QLoRA fine-tune, with prompt-injection defenses.
 %------------------------------------------------
 \section*{Skills}
 \textbf{Programming Languages:} Python, SQL, TypeScript, JavaScript \\
-\textbf{AI/ML:} RAG, Hybrid Search, Multi-Agent Systems, LLM Fine-tuning (QLoRA), MCP, Google ADK, LangChain, Vector Databases\\
+\textbf{AI/ML:} RAG, Hybrid Search, Text\mbox{-}to\mbox{-}SQL, Prompt Engineering, LLM Guardrails, Multi-Agent Systems, LLM Fine-tuning (QLoRA), MCP, Google ADK, LangChain, Vector Databases\\
 \textbf{Frameworks:} FastAPI, LangGraph, React, Unsloth \\
 \textbf{Databases \& Vector Search:} PostgreSQL, pgvector\\
-\textbf{Developer Tools:} Git, GitHub, Docker, Vercel
+\textbf{Developer Tools:} Git, GitHub, Docker, Vercel, Render, AI-assisted development
 
 %------------------------------------------------
 \section*{Projects}
@@ -64,10 +64,10 @@ with experience shipping live AI applications.
 \textbf{Halos AI -- F1 Chatbot \textbar\; Python, FastAPI \;\textbar\; \href{https://halos-ai.vercel.app}{halos-ai.vercel.app} \;\textbar\; \href{https://github.com/VineshF1/halos-ai}{github.com/VineshF1/halos-ai}}
 \hfill
 \begin{itemize}
-\item Built a full-stack LLM application that routes each query to hybrid RAG (BM25 + pgvector) or Text\mbox{-}to\mbox{-}SQL, with 27/30 routing accuracy on a labeled test set.
+\item Built a full-stack LLM application (React/TypeScript front end, FastAPI backend) that routes each query to hybrid RAG (BM25 + pgvector) or Text\mbox{-}to\mbox{-}SQL, with 27/30 routing accuracy on a labeled test set.
 \item Validated Text-to-SQL on 20 known-answer queries against the live deployment: 16/20 correct (80\%).
-\item Embedded and indexed 64 scraped Wikipedia pages with NVIDIA NV-Embed-v1 on Neon PostgreSQL with pgvector.
-\item Implemented prompt-injection pattern filtering, input sanitization and per-IP rate limiting (30 requests/min); deployed on Vercel and Render.
+\item Scraped 64 Wikipedia pages with Playwright, chunked them to 1,469 embeddings with NVIDIA NV-Embed-v1 and indexed them in Neon PostgreSQL with pgvector.
+\item Implemented prompt-injection detection, input sanitization and per-IP rate limiting (30 requests/min) on the FastAPI backend; deployed to Vercel and Render.
 \end{itemize}
 \vspace{2pt}
 
