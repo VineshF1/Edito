@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { writingScore } from "@/lib/writing-score";
 
 type Keyword = { term: string; important: boolean };
 
@@ -76,6 +77,34 @@ export default function Optimizer() {
   const [result, setResult] = useState<Result | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [addedSuggestions, setAddedSuggestions] = useState<string[]>([]);
+
+  // User-confirmed JD keywords: append to the skill line with the most term
+  // overlap (or AI/ML as fallback) for this run only.
+  function addSuggested(term: string) {
+    if (!result || addedSuggestions.includes(term)) return;
+    const skills = result.edits.skills.map((l) => ({ ...l, items: [...l.items] }));
+    const toks = term.toLowerCase().split(/[^a-z0-9+#.]+/).filter(Boolean);
+    let best = skills.findIndex((l) => l.label === "AI/ML");
+    let bestHits = -1;
+    skills.forEach((l, i) => {
+      const hits = l.items
+        .join(" ")
+        .toLowerCase()
+        .split(/[^a-z0-9+#.]+/)
+        .filter((w) => toks.includes(w)).length;
+      if (hits > bestHits) {
+        bestHits = hits;
+        best = i;
+      }
+    });
+    if (best < 0) best = 0;
+    if (!skills[best].items.some((x) => x.toLowerCase() === term.toLowerCase())) {
+      skills[best].items.push(term);
+    }
+    setResult({ ...result, edits: { ...result.edits, skills } });
+    setAddedSuggestions((s) => [...s, term]);
+  }
 
   function pdfFileName(r: Result | null): string {
     const t = (r?.roleTitle || "")
@@ -184,6 +213,7 @@ export default function Optimizer() {
     setResult(null);
     setPdfUrl(null);
     setPdfBlob(null);
+    setAddedSuggestions([]);
     if (jd.trim().length < 30) {
       setError("Paste a job description first — at least a few full sentences.");
       return;
@@ -239,6 +269,12 @@ export default function Optimizer() {
 
   const changedSkillCount =
     result?.edits.skillDiffs.filter((s) => s.before !== s.after).length ?? 0;
+  const writing = result
+    ? writingScore({
+        summary: result.edits.summary,
+        bullets: result.edits.bulletDiffs.flatMap((b) => b.after),
+      })
+    : null;
 
   return (
     <div className="space-y-7">
@@ -397,14 +433,21 @@ export default function Optimizer() {
                       JD keywords your resume doesn’t evidence yet
                     </p>
                     <p className="mb-2 text-[11px] leading-relaxed text-[var(--muted)]">
-                      Only add these — to your master resume — if you have
-                      genuinely used them. The tailor won’t fake them.
+                      Tap one only if you have genuinely used it — it’s added
+                      to your skills for this run, then typeset. The tailor
+                      won’t fake anything on its own.
                     </p>
                     <div className="flex flex-wrap gap-1.5">
                       {result.suggested.map((t) => (
-                        <span key={t} className="chip">
-                          {t}
-                        </span>
+                        <button
+                          key={t}
+                          onClick={() => addSuggested(t)}
+                          disabled={addedSuggestions.includes(t)}
+                          className={`chip ${addedSuggestions.includes(t) ? "opacity-50" : "cursor-pointer"}`}
+                          title="Add to skills for this run"
+                        >
+                          + {t}
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -412,6 +455,31 @@ export default function Optimizer() {
               </div>
             </div>
           </section>
+
+          {writing && (
+            <section className="panel p-4 sm:p-6">
+              <div className="mb-2 flex items-baseline justify-between gap-3">
+                <h3 className="kicker">Writing quality · after</h3>
+                <span className="num text-sm font-semibold">
+                  {writing.score}/100
+                </span>
+              </div>
+              {writing.issues.length === 0 ? (
+                <p className="text-xs text-[var(--muted)]">
+                  No weak openers, buzzwords or missing numbers found.
+                </p>
+              ) : (
+                <ul className="space-y-1.5">
+                  {writing.issues.map((it, i) => (
+                    <li key={i} className="text-xs text-[var(--ink-2)]">
+                      <span className="text-[var(--muted)]">{it.where}:</span>{" "}
+                      {it.issue}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
 
           {/* Summary */}
           <section className="panel p-4 sm:p-6">
