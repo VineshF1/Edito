@@ -9,7 +9,6 @@ import {
 import {
   KEYWORD_EXTRACTION_SYSTEM,
   RESUME_RULES_SYSTEM,
-  atsScore,
   rewriteUserPrompt,
 } from "@/lib/prompts";
 import { repairJson } from "@/lib/nim";
@@ -381,8 +380,33 @@ export async function POST(req: NextRequest) {
     const after = matchKeywords(keywords, afterText);
     const scoreBeforeText = matchKeywords(scoreSet, baselineText);
     const scoreAfterText = matchKeywords(scoreSet, afterText);
-    const scoreBefore = atsScore(scoreBeforeText.matched.length, scoreSet.length);
-    const scoreAfter = atsScore(scoreAfterText.matched.length, scoreSet.length);
+    // Weight by how central each keyword is to the JD: a term the posting
+    // repeats is worth more than a one-off mention. Weight = 1 + log2(hits).
+    const jdLower = jdText.toLowerCase();
+    const weightOf = (term: string): number => {
+      const t = term.toLowerCase();
+      let hits = 0;
+      let from = 0;
+      while (hits < 64) {
+        const at = jdLower.indexOf(t, from);
+        if (at === -1) break;
+        hits++;
+        from = at + t.length;
+      }
+      return 1 + Math.log2(1 + hits);
+    };
+    const weightTotal = scoreSet.reduce((s, k) => s + weightOf(k.term), 0);
+    const weightMatched = (matched: string[]) =>
+      scoreSet
+        .filter((k) => matched.some((m) => m === k.term))
+        .reduce((s, k) => s + weightOf(k.term), 0);
+    const scoreAt = (matched: string[]) => {
+      if (!weightTotal) return 70;
+      const cov = Math.min(weightMatched(matched) / weightTotal, 1);
+      return Math.round(90 * cov + 10);
+    };
+    const scoreBefore = scoreAt(scoreBeforeText.matched);
+    const scoreAfter = scoreAt(scoreAfterText.matched);
 
     const skillDiffs = BASELINE.skills.map((s, i) => ({
       label: s.label,

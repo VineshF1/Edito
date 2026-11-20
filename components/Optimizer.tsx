@@ -38,7 +38,7 @@ function ScoreRing({ label, score }: { label: string; score: number }) {
   const c = 2 * Math.PI * r;
   const dash = (Math.min(score, 100) / 100) * c;
   const color =
-    score >= 85 ? "var(--accent)" : score >= 70 ? "var(--warn)" : "var(--danger)";
+    score >= 85 ? "var(--accent)" : score >= 55 ? "var(--warn)" : "var(--danger)";
   return (
     <div className="panel flex items-center gap-4 p-4 sm:p-5">
       <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden className="flex-none">
@@ -61,7 +61,13 @@ function ScoreRing({ label, score }: { label: string; score: number }) {
           {score}
         </p>
         <p className="mt-0.5 text-xs text-[var(--muted)]">
-          {score >= 85 ? "strong match" : score >= 70 ? "competitive" : "weak match"}
+          {score >= 85
+            ? "strong match"
+            : score >= 70
+              ? "competitive"
+              : score >= 55
+                ? "partial match"
+                : "weak match"}
         </p>
       </div>
     </div>
