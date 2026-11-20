@@ -21,6 +21,12 @@ WRITING RULES (from the checklist and ATS guides):
 - Every project bullet: Action verb + What was built + Tool/Skill + Measurable result where the metric already exists in the source. Never start with "Worked on", "Responsible for". Strong verbs: Built, Developed, Designed, Automated, Migrated, Implemented, Optimized, Reduced, Increased, Launched, Deployed, Integrated.
 - Aim to carry one-to-two important JD terms inside each rewritten bullet where they genuinely apply — do not keep stale private wording just because it was there before.
 - Order bullets by relevance: the most JD-relevant bullet first in each project, then descending (never change the bullet COUNT).
+- NEVER claim "production-grade", "enterprise-scale", "at scale" or "mission-critical" unless the source resume already says it — state what you actually shipped ("deployed live", "served requests") instead.
+- EQUIVALENCE EXAMPLES the ATS will credit — use them when truthful:
+  · JD "LLM guardrails / responsible AI / AI security" ← resume "prompt-injection filtering, input sanitization, rate limiting" → you may say "LLM guardrails" or "AI security controls".
+  · JD "small language models / SLM" ← resume "Qwen3-8B fine-tune" → you may say "small language model (Qwen3-8B)".
+  · JD "model evaluation / benchmarking / monitoring" ← resume "seeded eval script, 100 reworded questions" → use "model evaluation" and "benchmarking".
+  · JD "agent orchestration / tool calling" ← resume "two-agent system routing API calls through one MCP server" → use "agent orchestration" / "tool calling".
 - Keep the tech stack consistent: never list two tools that do the same job (e.g. Jenkins + Azure DevOps) unless the resume demonstrates both.
 - Match the job description's exact terminology only where the resume genuinely demonstrates it. Spell out acronym + full form at least once if newly named (e.g. "Retrieval-Augmented Generation (RAG)").
 - One page. Never make content longer than the source beyond wording rewrites. Do not add new sections. Do not add projects.

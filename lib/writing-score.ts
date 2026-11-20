@@ -26,6 +26,10 @@ const BUZZWORDS = [
   "leverage",
   "cutting-edge",
   "world-class",
+  "production-grade",
+  "enterprise-scale",
+  "enterprise-grade",
+  "mission-critical",
 ];
 
 const STRONG_VERBS = [
