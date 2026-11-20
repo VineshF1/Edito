@@ -292,9 +292,11 @@ export async function POST(req: NextRequest) {
         .slice(0, MAX_ADD);
       for (const term of additions) {
         const termToks = tokensOf(term);
-        let best = 0;
-        let bestScore = -1;
+        const aiLine = edits.skills.findIndex((l) => l.label === "AI/ML");
+        let best = aiLine >= 0 ? aiLine : 0;
+        let bestScore = 0;
         edits.skills.forEach((line, i) => {
+          if (i === best) return;
           const room =
             Math.max(BASELINE.skills[i].items.length + 1, 7) - line.items.length;
           if (room <= 0) return;

@@ -84,20 +84,23 @@ export default function Optimizer() {
   function addSuggested(term: string) {
     if (!result || addedSuggestions.includes(term)) return;
     const skills = result.edits.skills.map((l) => ({ ...l, items: [...l.items] }));
-    const toks = term.toLowerCase().split(/[^a-z0-9+#.]+/).filter(Boolean);
-    let best = skills.findIndex((l) => l.label === "AI/ML");
-    let bestHits = -1;
+    const AIISH = /rag|agent|llm|embedding|prompt|vector|fine|eval|context|retrieval|token|quantiz/i;
+    const aiLine = skills.findIndex((l) => l.label === "AI/ML");
+    let best = aiLine >= 0 ? aiLine : 0;
+    let bestHits = 0;
     skills.forEach((l, i) => {
+      if (i === best) return;
       const hits = l.items
         .join(" ")
         .toLowerCase()
         .split(/[^a-z0-9+#.]+/)
-        .filter((w) => toks.includes(w)).length;
+        .filter((w) => term.toLowerCase().includes(w) && w.length > 2).length;
       if (hits > bestHits) {
         bestHits = hits;
         best = i;
       }
     });
+    if (AIISH.test(term) && aiLine >= 0) best = aiLine;
     if (best < 0) best = 0;
     if (!skills[best].items.some((x) => x.toLowerCase() === term.toLowerCase())) {
       skills[best].items.push(term);
