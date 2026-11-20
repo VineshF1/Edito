@@ -74,6 +74,38 @@ export default function Optimizer() {
   const [error, setError] = useState("");
   const [result, setResult] = useState<Result | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+
+  function pdfFileName(r: Result | null): string {
+    const t = (r?.roleTitle || "")
+      .replace(/[^\w\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "_")
+      .slice(0, 50);
+    return t && t.toLowerCase() !== "resume"
+      ? `Vinesh_Resume_${t}.pdf`
+      : "Vinesh_Resume.pdf";
+  }
+
+  async function sharePdf() {
+    if (!pdfBlob) return;
+    const name = pdfFileName(result);
+    try {
+      const file = new File([pdfBlob], name, { type: "application/pdf" });
+      const nav = navigator as Navigator & {
+        canShare?: (d: { files?: File[] }) => boolean;
+      };
+      if (nav.canShare?.({ files: [file] }) && nav.share) {
+        await nav.share({ files: [file], title: name });
+      } else {
+        // Web Share with files unavailable — open the blob so the browser's
+        // own save/print flow takes over.
+        window.open(pdfUrl ?? "", "_blank");
+      }
+    } catch {
+      // user dismissed the share sheet — nothing to do
+    }
+  }
 
   // Mobile browsers (Android Chrome, iOS Safari) render PDF blobs poorly or
   // not at all inside iframes — swap the preview for open/download actions.
@@ -139,6 +171,7 @@ export default function Optimizer() {
   }
   function restore(entry: HistoryEntry) {
     setPdfUrl(null);
+    setPdfBlob(null);
     setError("");
     setResult(entry.result);
     setJd((j) => j || entry.jdExcerpt);
@@ -149,6 +182,7 @@ export default function Optimizer() {
     setError("");
     setResult(null);
     setPdfUrl(null);
+    setPdfBlob(null);
     if (jd.trim().length < 30) {
       setError("Paste a job description first — at least a few full sentences.");
       return;
@@ -192,7 +226,9 @@ export default function Optimizer() {
         const d = await res.json();
         throw new Error(d.error || "Compile failed");
       }
-      setPdfUrl(URL.createObjectURL(await res.blob()));
+      const blob = await res.blob();
+      setPdfBlob(blob);
+      setPdfUrl(URL.createObjectURL(blob));
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -314,8 +350,12 @@ export default function Optimizer() {
             <ScoreRing label="ATS score · before" score={result.scoreBefore} />
             <ScoreRing label="ATS score · after" score={result.scoreAfter} />
             <p className="col-span-2 text-center text-xs text-[var(--muted)]">
-              Score = coverage of the keywords the JD analysis flagged
-              important (chips below show every keyword).
+              Score = how many of the JD&apos;s flagged-important keywords the
+              resume text contains ({result.matchedAfter.filter((t) =>
+                result.keywords.some((k) => k.important && k.term === t)
+              ).length}
+              of {result.keywords.filter((k) => k.important).length} after).
+              Chips below show every keyword.
             </p>
           </section>
 
@@ -486,19 +526,18 @@ export default function Optimizer() {
                   )}
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-3">
+                  {isMobile && (
+                    <button
+                      onClick={sharePdf}
+                      className="btn-primary px-5 py-2.5 text-sm"
+                    >
+                      Share / Save PDF
+                    </button>
+                  )}
                   <a
                     href={pdfUrl}
-                    download={(() => {
-                      const t = (result.roleTitle || "")
-                        .replace(/[^\w\s-]/g, "")
-                        .trim()
-                        .replace(/\s+/g, "_")
-                        .slice(0, 50);
-                      return t && t.toLowerCase() !== "resume"
-                        ? `Vinesh_Resume_${t}.pdf`
-                        : "Vinesh_Resume.pdf";
-                    })()}
-                    className="btn-primary px-5 py-2.5 text-sm"
+                    download={pdfFileName(result)}
+                    className={`px-5 py-2.5 text-sm ${isMobile ? "btn-ghost" : "btn-primary"}`}
                   >
                     Download PDF
                   </a>

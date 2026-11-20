@@ -253,6 +253,7 @@ export async function POST(req: NextRequest) {
     // 1) skills: drop items the resume cannot support, cap per line
     let trimmedSkills: string[] = [];
     const supportedText = resumeAsText(BASELINE);
+    const supportSet = new TokenSet(supportedText);
     const tokensOf = (s: string) =>
       s.toLowerCase().split(/[^a-z0-9+#.]+/i).filter((w) => w.length > 1);
     for (let i = 0; i < edits.skills.length; i++) {
@@ -263,7 +264,7 @@ export async function POST(req: NextRequest) {
       items = items.filter((item) => {
         const toks = tokensOf(item);
         if (!toks.length) return false;
-        const hits = toks.filter((w) => supportedText.includes(w)).length;
+        const hits = toks.filter((w) => supportSet.hasWord(w)).length;
         return hits / toks.length >= 0.5;
       });
       for (const gone of line.items.filter((x) => !items.includes(x))) {
@@ -271,6 +272,46 @@ export async function POST(req: NextRequest) {
       }
       if (!items.length) items = before.items; // never empty a line
       edits.skills[i].items = items;
+    }
+
+    // 1b) Backfill: the writer under-delivers on skills. For the most
+    // important JD keywords the baseline genuinely supports, ensure at
+    // least SOME appear in Skills — capped at 4 so it never becomes
+    // keyword stuffing.
+    {
+      const MAX_ADD = 4;
+      const editsText = new TokenSet(resumeAsText(edits));
+      const additions = keywords
+        .filter((k) => k.important)
+        .map((k) => k.term.trim())
+        .filter((t) => t.length > 1 && t.length <= 32)
+        .filter(
+          (t) => termMatched(t, supportSet) && !termMatched(t, editsText)
+        )
+        .slice(0, MAX_ADD);
+      for (const term of additions) {
+        const termToks = tokensOf(term);
+        let best = 0;
+        let bestScore = -1;
+        edits.skills.forEach((line, i) => {
+          const room =
+            Math.max(BASELINE.skills[i].items.length + 1, 7) - line.items.length;
+          if (room <= 0) return;
+          const overlap = line.items
+            .join(" ")
+            .toLowerCase()
+            .split(/[^a-z0-9+#.]+/i)
+            .filter((w) => termToks.includes(w)).length;
+          if (overlap > bestScore) {
+            bestScore = overlap;
+            best = i;
+          }
+        });
+        const line = edits.skills[best];
+        if (line.items.length < Math.max(BASELINE.skills[best].items.length + 1, 7)) {
+          line.items.push(term);
+        }
+      }
     }
     // 2) bullets: per-bullet length cap vs the source
     const bulletCap = (before: string) => before.length * 1.15 + 30;

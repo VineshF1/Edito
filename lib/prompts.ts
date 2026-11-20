@@ -20,6 +20,8 @@ WRITING RULES (from the checklist and ATS guides):
   Choose (1) aggressively across skills AND project bullets — few tools-and-terms should keep the resume's private wording when the JD names the same thing differently. But option (2) is absolute: no unsupported tool, framework, cloud platform, or certification ever appears.
 - Every project bullet: Action verb + What was built + Tool/Skill + Measurable result where the metric already exists in the source. Never start with "Worked on", "Responsible for". Strong verbs: Built, Developed, Designed, Automated, Migrated, Implemented, Optimized, Reduced, Increased, Launched, Deployed, Integrated.
 - Aim to carry one-to-two important JD terms inside each rewritten bullet where they genuinely apply — do not keep stale private wording just because it was there before.
+- Order bullets by relevance: the most JD-relevant bullet first in each project, then descending (never change the bullet COUNT).
+- Keep the tech stack consistent: never list two tools that do the same job (e.g. Jenkins + Azure DevOps) unless the resume demonstrates both.
 - Match the job description's exact terminology only where the resume genuinely demonstrates it. Spell out acronym + full form at least once if newly named (e.g. "Retrieval-Augmented Generation (RAG)").
 - One page. Never make content longer than the source beyond wording rewrites. Do not add new sections. Do not add projects.
 - ATS-first: single column (guaranteed by fixed template), standard headings (fixed), selectable text, exact tool names as the JD writes them.
