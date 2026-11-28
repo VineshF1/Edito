@@ -19,9 +19,9 @@ export const PROJECT_META: { id: string; titleLatex: string }[] = [
       "\\textbf{Halos AI -- F1 Chatbot \\textbar\\; Python, FastAPI \\;\\textbar\\; \\href{https://halos-ai.vercel.app}{halos-ai.vercel.app} \\;\\textbar\\; \\href{https://github.com/VineshF1/halos-ai}{github.com/VineshF1/halos-ai}}\n\\hfill",
   },
   {
-    id: "skytrace",
+    id: "splice",
     titleLatex:
-      "\\textbf{SkyTrace -- Satellite Tracker \\;\\textbar\\; Python, Google ADK, MCP \\;\\textbar\\; \\href{https://github.com/VineshF1/skytrace}{github.com/VineshF1/skytrace}}\n\\hfill",
+      "\\textbf{Splice -- LLM Gateway \\;\\textbar\\; Python \\;\\textbar\\; \\href{https://github.com/VineshF1/Splice}{github.com/VineshF1/Splice}}\n\\hfill",
   },
   {
     id: "eaurouge",
@@ -86,10 +86,11 @@ export const BASELINE: ResumeContent = {
       ],
     },
     {
-      id: "skytrace",
+      id: "splice",
       bullets: [
-        "Engineered a two-agent satellite tracker (Google ADK) that routes all external API calls through one MCP server; 14/14 tests pass.",
-        "Integrated Celestrak, N2YO and Nominatim with SGP4 orbit propagation, ECEF/Haversine distance math and token-bucket rate limiting (burst of 15: 10 allowed, 5 blocked).",
+        "Built an async FastAPI LLM gateway that routes requests to cheap or strong NVIDIA models by rule; on a 30-task agent exam the router scored 63.3% vs 60.0% for always-strong at 78% lower simulated cost.",
+        "Added fault tolerance -- retries only on timeout/429/5xx with jittered backoff and Retry-After, a backup model, a 30 RPM token bucket and a SHA-256 response cache; 0 errors across 194 exam requests.",
+        "Built a 30-task agent exam with a safe calculator and fact lookup, scored on answer, tools and steps; saved traces before scoring so a crash never repeats requests, with CI running 163 mock-only tests.",
       ],
     },
     {

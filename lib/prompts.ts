@@ -48,7 +48,7 @@ Edit ONLY, returning JSON with this exact shape:
 {
   "summary": "<rewritten summary, plain text>",
   "skills": [{"label": "<exact original label>", "items": ["...", ...]}],
-  "projects": [{"id": "halos"|"skytrace"|"eaurouge", "bullets": ["...", ...]}]
+  "projects": [{"id": "halos"|"splice"|"eaurouge", "bullets": ["...", ...]}]
 }
 
 Rules for output:

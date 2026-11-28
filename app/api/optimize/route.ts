@@ -467,6 +467,6 @@ export async function POST(req: NextRequest) {
 
 const PROJECT_NAME: Record<string, string> = {
   halos: "Halos AI — F1 Chatbot",
-  skytrace: "SkyTrace — Satellite Tracker",
+  splice: "Splice -- LLM Gateway",
   eaurouge: "EauRouge-F1 — Qwen3-8B QLoRA",
 };

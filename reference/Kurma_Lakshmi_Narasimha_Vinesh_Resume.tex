@@ -71,11 +71,12 @@ MCP) plus a QLoRA fine-tune, with prompt-injection defenses.
 \end{itemize}
 \vspace{2pt}
 
-\textbf{SkyTrace -- Satellite Tracker \;\textbar\; Python, Google ADK, MCP \;\textbar\; \href{https://github.com/VineshF1/skytrace}{github.com/VineshF1/skytrace}}
+\textbf{Splice -- LLM Gateway \;\textbar\; Python \;\textbar\; \href{https://github.com/VineshF1/Splice}{github.com/VineshF1/Splice}}
 \hfill
 \begin{itemize}
-\item Engineered a two-agent satellite tracker (Google ADK) that routes all external API calls through one MCP server; 14/14 tests pass.
-\item Integrated Celestrak, N2YO and Nominatim with SGP4 orbit propagation, ECEF/Haversine distance math and token-bucket rate limiting (burst of 15: 10 allowed, 5 blocked).
+\item Built an async FastAPI LLM gateway that routes requests to cheap or strong NVIDIA models by rule; on a 30-task agent exam the router scored 63.3\% vs 60.0\% for always-strong at 78\% lower simulated cost.
+\item Added fault tolerance -- retries only on timeout/429/5xx with jittered backoff and Retry-After, a backup model, a 30 RPM token bucket and a SHA-256 response cache; 0 errors across 194 exam requests.
+\item Built a 30-task agent exam with a safe calculator and fact lookup, scored on answer, tools and steps; saved traces before scoring so a crash never repeats requests, with CI running 163 mock-only tests.
 \end{itemize}
 \vspace{2pt}
 
