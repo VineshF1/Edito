@@ -39,28 +39,12 @@ function buildSkillsLatex(c: ResumeContent): string {
     .join("\\\\\n");
 }
 
-const METRIC_RE = new RegExp("\\b\\d[\\d,.]*(?:\\/\\d+)?%?", "g");
-
-// Escape a bullet but render its numeric metrics in bold (readers skim to
-// numbers; text extraction is unaffected by weight).
-function boldMetrics(raw: string): string {
-  let out = "";
-  let last = 0;
-  for (const m of raw.matchAll(METRIC_RE)) {
-    const idx = m.index ?? 0;
-    out += escapeLaTeX(raw.slice(last, idx));
-    out += "\\textbf{" + escapeLaTeX(m[0]) + "}";
-    last = idx + m[0].length;
-  }
-  return out + escapeLaTeX(raw.slice(last));
-}
-
 function buildProjectsLatex(c: ResumeContent): string {
   const blocks = PROJECT_META.map((meta) => {
     const proj = c.projects.find((p) => p.id === meta.id);
     if (!proj) throw new Error(`missing project content for ${meta.id}`);
     const items = proj.bullets
-      .map((b) => `\\item ${boldMetrics(b)}`)
+      .map((b) => `\\item ${escapeLaTeX(b)}`)
       .join("\n");
     return `${latexLine(meta.titleLatex)}\n\\begin{itemize}\n${items}\n\\end{itemize}`;
   });
